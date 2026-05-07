@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise 💖</title>
+
+<style>
+body {
+  margin:0;
+  overflow:hidden;
+  font-family:cursive;
+  background:#ffe6f0;
+}
+
+.page {
+  display:none;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+}
+.active { display:flex; }
+
+button {
+  padding:10px 20px;
+  border-radius:20px;
+  border:none;
+  background:#ff4081;
+  color:white;
+  margin:10px;
+  cursor:pointer;
+}
+
+.float {
+  position:absolute;
+  bottom:-50px;
+  animation:floatUp 8s linear infinite;
+}
+@keyframes floatUp {
+  100% { transform:translateY(-110vh); opacity:0; }
+}
+
+.cake { font-size:100px; cursor:pointer; }
+
+.gift {
+  font-size:80px;
+  position:absolute;
+  cursor:pointer;
+}
+
+.confetti {
+  position:absolute;
+  width:10px;
+  height:10px;
+  animation:fall 3s linear infinite;
+}
+@keyframes fall {
+  to { transform:translateY(100vh) rotate(360deg); }
+}
+
+#noBtn { position:relative; }
+
+img,video {
+  border-radius:15px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<script>
+/* floating */
+setInterval(()=>{
+  let e=document.createElement("div");
+  e.className="float";
+  e.innerHTML=["🎈","💖","⭐"][Math.floor(Math.random()*3)];
+  e.style.left=Math.random()*100+"vw";
+  e.style.fontSize=(20+Math.random()*30)+"px";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),8000);
+},300);
+</script>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <h2>Enter Password 🔐</h2>
+  <input type="password" id="pass">
+  <button onclick="checkPass()">Enter</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <h1>🎉 Happy Birthday 🎉</h1>
+  <p id="typing"></p>
+  <button onclick="nextPage()">Next</button>
+</div>
+
+<!-- PAGE 3 VIDEO -->
+<div class="page" id="page3">
+  <video controls autoplay muted loop style="width:90%; max-width:600px;">
+    <source src="video.mp4" type="video/mp4">
+  </video>
+  <button onclick="nextPage()">Next</button>
+</div>
+
+<!-- PAGE 4 PHOTOS -->
+<div class="page" id="page4">
+  <h2>Memories 💕</h2>
+  <img id="slide" src="photo1.jpg" style="width:80%; max-width:400px;">
+  <button onclick="nextPage()">Next</button>
+</div>
+
+<!-- PAGE 5 CAKE -->
+<div class="page" id="page5">
+  <h2>Tap Cake 🎂</h2>
+  <div class="cake" onclick="blow()">🎂🕯️</div>
+</div>
+
+<!-- PAGE 6 QUESTION -->
+<div class="page" id="page6">
+  <h2>Are you excited? 😏</h2>
+  <button onclick="nextPage()">Yes 😍</button>
+  <button id="noBtn">No 😒</button>
+</div>
+
+<!-- PAGE 7 GIFT -->
+<div class="page" id="page7">
+  <h2>Catch the Gift 🎁</h2>
+  <div class="gift" id="gift">🎁</div>
+  <p>Tap 5 times to open</p>
+</div>
+
+<!-- PAGE 8 MESSAGE -->
+<div class="page" id="page8">
+  <h2>💌 Message</h2>
+  <p id="msg"></p>
+  <button onclick="nextPage()">Next</button>
+</div>
+
+<!-- PAGE 9 FINAL -->
+<div class="page" id="page9">
+  <h2>💖 Final Message 💖</h2>
+  <p id="final"></p>
+</div>
+
+<script>
+let currentPage=1;
+
+/* voice */
+function speak(text){
+  let msg=new SpeechSynthesisUtterance(text);
+  msg.rate=0.9;
+  speechSynthesis.speak(msg);
+}
+
+/* password */
+function checkPass(){
+  if(pass.value==="1234"){
+    nextPage();
+    music.play().catch(()=>{});
+    let intro="You are the most special person in my life";
+    typeText("typing",intro);
+    speak(intro);
+  } else alert("Wrong Password");
+}
+
+/* page switch */
+function nextPage(){
+  document.getElementById("page"+currentPage).classList.remove("active");
+  currentPage++;
+  document.getElementById("page"+currentPage).classList.add("active");
+}
+
+/* slideshow */
+let photos=["photo1.jpg","photo2.jpg","photo3.jpg"];
+let i=0;
+setInterval(()=>{
+  if(currentPage===4){
+    i=(i+1)%photos.length;
+    document.getElementById("slide").src=photos[i];
+  }
+},2000);
+
+/* cake */
+function blow(){
+  document.querySelector(".cake").innerHTML="🎂✨";
+  confetti();
+  setTimeout(nextPage,1000);
+}
+
+/* confetti */
+function confetti(){
+  for(let i=0;i<50;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+
+/* no button */
+noBtn.onmouseover=()=>{
+  noBtn.style.position="absolute";
+  noBtn.style.left=Math.random()*window.innerWidth+"px";
+  noBtn.style.top=Math.random()*window.innerHeight+"px";
+};
+
+/* gift */
+let count=0;
+gift.onclick=()=>{
+  count++;
+  gift.style.left=Math.random()*80+"vw";
+  gift.style.top=Math.random()*80+"vh";
+
+  if(count>=5){
+    confetti();
+    nextPage();
+    let giftMsg="You are my happiness, my smile, my everything";
+    typeText("msg",giftMsg);
+    speak(giftMsg);
+  }
+};
+
+/* typing */
+function typeText(id,text){
+  let i=0;
+  let el=document.getElementById(id);
+  el.innerHTML="";
+  let inter=setInterval(()=>{
+    el.innerHTML+=text[i];
+    i++;
+    if(i>=text.length) clearInterval(inter);
+  },50);
+}
+
+/* final message */
+let finalMsg=`
+You are not just someone special...
+
+You are the reason behind my smile,
+the peace in my chaos,
+and the happiness I never want to lose.
+
+Happy Birthday 💖
+
+jindagi mai isi tarah muskurate rehne muskannnnnnnnnnnnnnn
+`;
+
+typeText("final",finalMsg);
+setTimeout(()=>speak(finalMsg),2000);
+
+</script>
+
+</body>
+</html>
